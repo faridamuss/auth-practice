@@ -21,10 +21,14 @@ async function main() {
 }
 
 // a Schema for userDB
-const userSchema = {
+const userSchema = new mongoose.Schema ({
   email: String,
   password: String
-};
+});
+
+// it important to create this plugin before creating a mongoose model!
+const secret = "Thisisourlittlesecret";
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["password"] });
 
 // a Mongoose Model
 const User = new mongoose.model("User", userSchema);
