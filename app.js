@@ -1,9 +1,10 @@
 // MODULES:
+require('dotenv').config()
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-var encrypt = require("mongoose-encryption");
+const encrypt = require("mongoose-encryption");
 
 const PORT = 3000;
  
@@ -27,8 +28,10 @@ const userSchema = new mongoose.Schema ({
 });
 
 // it important to create this plugin before creating a mongoose model!
-const secret = "Thisisourlittlesecret";
-userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["password"] });
+userSchema.plugin(encrypt, { 
+  secret: process.env.SECRET, 
+  encryptedFields: ["password"] 
+});
 
 // a Mongoose Model
 const User = new mongoose.model("User", userSchema);
