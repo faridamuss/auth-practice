@@ -1,16 +1,16 @@
 // MODULES:
-const express = require('express');
-const bodyParser = require('body-parser');
-const ejs = require('ejs');
-const mongoose = require('mongoose');
-var encrypt = require('mongoose-encryption');
+const express = require("express");
+const bodyParser = require("body-parser");
+const ejs = require("ejs");
+const mongoose = require("mongoose");
+var encrypt = require("mongoose-encryption");
 
 const PORT = 3000;
  
 const app = express();
  
-app.use(express.static('public'));
-app.set('view engine', 'ejs');
+app.use(express.static("public"));
+app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 
 /////////////////////////////CONNECTION TO MONGODB///////////////////////
@@ -77,8 +77,8 @@ app.post("/login", function(req, res) {
         }
       }
     }
-  })
-})
+  });
+});
  
 // PORT is listening
 app.listen(PORT, () => {
