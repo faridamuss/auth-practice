@@ -141,7 +141,7 @@ app.get("/secrets", function (req, res) {
     if (err) {
       console.log(err);
     } else {
-      res.render("secrets", {usersWithSecrets: foundUsers});
+      res.render("secrets", { usersWithSecrets: foundUsers });
     }
   });
 });
