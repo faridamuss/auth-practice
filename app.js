@@ -37,7 +37,7 @@ async function main() {
 
 // a Schema for userDB
 const userSchema = new mongoose.Schema ({
-  email: String,
+  username: String,
   password: String
 });
 
@@ -51,8 +51,13 @@ const User = new mongoose.model("User", userSchema);
 // 4. Use passport to create a local strategy:
 passport.use(User.createStrategy());
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+ 
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
 
 // This is a set up for OAuth after your require the package, place it right before the routes: 
 passport.use(new GoogleStrategy({
@@ -62,6 +67,7 @@ passport.use(new GoogleStrategy({
   userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
 },
 function(accessToken, refreshToken, profile, cb) {
+  console.log(profile)
   User.findOrCreate({ googleId: profile.id }, function (err, user) {
     return cb(err, user);
   });
@@ -73,8 +79,15 @@ app.get("/", function(req, res) {
   res.render("home");
 });
 
-app.get('/auth/google',
+app.get("/auth/google",
   passport.authenticate("google", { scope: ['profile'] }));
+
+app.get("/auth/google/secrets", 
+  passport.authenticate('google', { failureRedirect: "/login" }),
+  function(req, res) {
+    // Successful authentication, redirect secrets page.
+    res.redirect("/secrets");
+  });
 
 app.get("/login", function(req, res) {
   res.render("login");
