@@ -75,12 +75,12 @@ app.post("/login", function(req, res) {
       console.log(err);
     } else {
       if(foundUser) {
-
-  
-
-        // if (foundUser.password === password) {
-          res.render("secrets");
-        }
+        // to compare the passwords inside db: 
+        bcrypt.compare(password, foundUser.password).then(function(result) {
+          if (result === true) {
+            res.render("secrets");
+          }
+        })
       }
     }
   });
