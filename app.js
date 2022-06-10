@@ -1,5 +1,5 @@
 // MODULES:
-require('dotenv').config()
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -80,7 +80,7 @@ app.post("/login", function(req, res) {
           if (result === true) {
             res.render("secrets");
           }
-        })
+        });
       }
     }
   });
