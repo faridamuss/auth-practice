@@ -4,19 +4,32 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-// using bcrypt to hash passwords:
-const bcrypt = require("bcrypt");
-const saltRounds = 10; 
+const session = require("express-session");
+const passport = require("passport");
+const passportLocalMongoose = require("express-local-mongoose");
 
 const PORT = 3000;
  
 const app = express();
+
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 
-/////////////////////////////CONNECTION TO MONGODB///////////////////////
-// connect to MongoDB
+// 1. setting up session with initial configurations:
+app.use(session({
+  secret: "Our litte secret.",
+  resave: false,
+  saveUninitialized: false,
+}))
+
+// 2. Use passport to initialize passport package: 
+app.use(passport.initialize());
+// 3. Use passport to set up our session:
+app.use(passport.session())
+
+
+// connecting to MongoDB
 main().catch((err) => console.log(err));
 async function main() {
   await mongoose.connect("mongodb://localhost:27017/userDB");
@@ -27,6 +40,9 @@ const userSchema = new mongoose.Schema ({
   email: String,
   password: String
 });
+
+// 3. Setting up (enabling) passport-local-mongoose as a plugin to hash & salt, as well as to save our users into a db: 
+userSchema.plugin(passportLocalMongoose);
 
 // a Mongoose Model
 const User = new mongoose.model("User", userSchema);
@@ -46,44 +62,11 @@ app.get("/register", function(req, res) {
 
 ///////////////////////////////POST REQUESTS////////////////////////////
 app.post("/register", function(req, res) {
-  const username = req.body.username;
-  const password = req.body.password;
 
-  bcrypt.hash(password, saltRounds, function(err, hash) {
-
-    const newUser = new User({
-      email: username,
-      password: hash
-    });
-
-    newUser.save(function(err) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.render("secrets");
-      }
-    });
-});
 });
 
 app.post("/login", function(req, res) {
-  const username = req.body.username;
-  const password = req.body.password;
-  // we are filtering through our db searching for the user using a username and a password
-  User.findOne({email: username}, function(err, foundUser) {
-    if(err) {
-      console.log(err);
-    } else {
-      if(foundUser) {
-        // to compare the passwords inside db: 
-        bcrypt.compare(password, foundUser.password).then(function(result) {
-          if (result === true) {
-            res.render("secrets");
-          }
-        });
-      }
-    }
-  });
+ 
 });
  
 // PORT is listening
