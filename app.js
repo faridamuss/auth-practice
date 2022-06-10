@@ -1,4 +1,3 @@
-// MODULES:
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -28,7 +27,6 @@ app.use(passport.initialize());
 // 3. Use passport to set up our session:
 app.use(passport.session())
 
-
 // connecting to MongoDB
 main().catch((err) => console.log(err));
 async function main() {
@@ -47,6 +45,12 @@ userSchema.plugin(passportLocalMongoose);
 // a Mongoose Model
 const User = new mongoose.model("User", userSchema);
 
+// 4. Use passport to create a local strategy:
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 /////////////////////////////GET REQUESTS/////////////////////////////
 app.get("/", function(req, res) {
   res.render("home");
@@ -60,9 +64,26 @@ app.get("/register", function(req, res) {
   res.render("register");
 });
 
+app.get("/secrets", function(req, res) {
+  if(req.isAuthenticated()) {
+    res.render("secrets");
+  } else {
+    res.redirect("/login");
+  }
+});
+
 ///////////////////////////////POST REQUESTS////////////////////////////
 app.post("/register", function(req, res) {
-
+  User.register({username: req.body.username}, req.body.password, function(err, user) {
+    if (err) {
+      console.log(err);
+      res.redirect("/register");
+    } else {
+      passport.authenticate("local")(req, res, function() {
+        res.redirect("/secrets");
+      })
+    }
+  })
 });
 
 app.post("/login", function(req, res) {
