@@ -18,7 +18,6 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// 1. setting up session with initial configurations:
 app.use(
   session({
     secret: "Our litte secret.",
@@ -27,18 +26,14 @@ app.use(
   })
 );
 
-// 2. Use passport to initialize passport package:
 app.use(passport.initialize());
-// 3. Use passport to set up our session:
 app.use(passport.session());
 
-// connecting to MongoDB
 main().catch((err) => console.log(err));
 async function main() {
   await mongoose.connect("mongodb://localhost:27017/userDB");
 }
 
-// a Schema for userDB
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
@@ -46,17 +41,13 @@ const userSchema = new mongoose.Schema({
   facebookId: String
 });
 
-// 3. Setting up (enabling) passport-local-mongoose as a plugin to hash & salt, as well as to save our users into a db:
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
-// a Mongoose Model
 const User = new mongoose.model("User", userSchema);
 
-// 4. Use passport to create a local strategy:
 passport.use(User.createStrategy());
 
-// Serialize and deserialize user for local authentication:
 passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
@@ -67,7 +58,6 @@ passport.deserializeUser(function (id, done) {
   });
 });
 
-// This is a set up for OAuth after your require the package, place it right before the routes:
 passport.use(
   new GoogleStrategy(
     {
@@ -86,7 +76,6 @@ passport.use(
   )
 );
 
-// Config strategy for FB:
 passport.use(
   new FacebookStrategy(
     {
