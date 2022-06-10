@@ -38,7 +38,8 @@ const userSchema = new mongoose.Schema({
   username: String,
   password: String,
   googleId: String,
-  facebookId: String
+  facebookId: String,
+  secret: String
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -118,7 +119,8 @@ app.get(
 
 app.get("/auth/facebook", passport.authenticate("facebook"));
 
-app.get("/auth/facebook/secrets",
+app.get(
+  "/auth/facebook/secrets",
   passport.authenticate("facebook", { failureRedirect: "/login" }),
   function (req, res) {
     // Successful authentication, redirect to secrets page.
@@ -142,6 +144,14 @@ app.get("/secrets", function (req, res) {
   }
 });
 
+app.get("/submit", function (req, res) {
+  if (req.isAuthenticated()) {
+    res.render("submit");
+  } else {
+    res.redirect("/login");
+  }
+});
+
 // This is taken from passport.js documentation
 // https://www.passportjs.org/tutorials/password/logout/
 app.get("/logout", function (req, res, next) {
@@ -152,6 +162,7 @@ app.get("/logout", function (req, res, next) {
     res.redirect("/");
   });
 });
+
 ///////////////////////////////POST REQUESTS////////////////////////////
 app.post("/register", function (req, res) {
   User.register(
@@ -183,6 +194,23 @@ app.post("/login", function (req, res) {
       passport.authenticate("local")(req, res, function () {
         res.redirect("/secrets");
       });
+    }
+  });
+});
+
+app.post("/submit", function (req, res) {
+  const submittedSecret = req.body.secret;
+  // console.log(req.user.id);
+  User.findById(req.user.id, function (err, foundUser) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (foundUser) {
+        foundUser.secret = submittedSecret;
+        foundUser.save(function () {
+          res.redirect("/secrets");
+        });
+      }
     }
   });
 });
