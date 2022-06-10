@@ -38,7 +38,8 @@ async function main() {
 // a Schema for userDB
 const userSchema = new mongoose.Schema ({
   username: String,
-  password: String
+  password: String, 
+  googleID: String
 });
 
 // 3. Setting up (enabling) passport-local-mongoose as a plugin to hash & salt, as well as to save our users into a db: 
@@ -69,8 +70,9 @@ passport.use(new GoogleStrategy({
   callbackURL: "http://localhost:3000/auth/google/secrets", 
   userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
 },
+
 function(accessToken, refreshToken, profile, cb) {
-  console.log(profile)
+  // console.log(profile)
   User.findOrCreate({ googleId: profile.id }, function (err, user) {
     return cb(err, user);
   });
