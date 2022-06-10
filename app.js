@@ -6,8 +6,8 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const findOrCreate = require('mongoose-find-or-create')
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const findOrCreate = require("mongoose-find-or-create")
 
 const PORT = 3000;
  
@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema ({
 
 // 3. Setting up (enabling) passport-local-mongoose as a plugin to hash & salt, as well as to save our users into a db: 
 userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate);
 
 // a Mongoose Model
 const User = new mongoose.model("User", userSchema);
