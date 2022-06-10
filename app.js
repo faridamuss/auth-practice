@@ -72,6 +72,14 @@ app.get("/secrets", function(req, res) {
   }
 });
 
+// This is taken from passport.js documentation
+// https://www.passportjs.org/tutorials/password/logout/
+app.get('/logout', function(req, res, next) {
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    res.redirect('/');
+  });
+});
 ///////////////////////////////POST REQUESTS////////////////////////////
 app.post("/register", function(req, res) {
   User.register({username: req.body.username}, req.body.password, function(err, user) {
