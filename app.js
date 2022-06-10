@@ -51,12 +51,15 @@ const User = new mongoose.model("User", userSchema);
 // 4. Use passport to create a local strategy:
 passport.use(User.createStrategy());
 
+// Serialize and deserialize user for local authentication: 
 passport.serializeUser(function(user, done) {
-  done(null, user);
+  done(null, user.id); 
 });
- 
-passport.deserializeUser(function(user, done) {
-  done(null, user);
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+      done(err, user);
+  });
 });
 
 // This is a set up for OAuth after your require the package, place it right before the routes: 
